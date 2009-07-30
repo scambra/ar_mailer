@@ -293,7 +293,7 @@ class ActionMailer::ARSendmail
       File.open(@@pid_file, 'w') {|f| f.write("#{Process.pid}\n")}
     end
 
-    new(options).run
+    Dir.chdir(options[:Chdir]) { new(options).run }
 
   rescue SystemExit
     raise
