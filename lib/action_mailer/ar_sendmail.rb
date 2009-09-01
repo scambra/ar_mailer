@@ -461,6 +461,7 @@ class ActionMailer::ARSendmail
         cleanup
         emails = find_emails
         deliver(emails) unless emails.empty?
+        ActionMailer::Base.logger.flush
       rescue ActiveRecord::Transactions::TransactionError
       end
       break if @once
