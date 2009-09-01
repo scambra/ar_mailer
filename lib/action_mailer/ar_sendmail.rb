@@ -290,10 +290,11 @@ class ActionMailer::ARSendmail
         end
       end
       WEBrick::Daemon.start
+      Dir.chdir options[:Chdir]
       File.open(@@pid_file, 'w') {|f| f.write("#{Process.pid}\n")}
     end
 
-    Dir.chdir(options[:Chdir]) { new(options).run }
+    new(options).run
 
   rescue SystemExit
     raise
