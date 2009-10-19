@@ -386,15 +386,17 @@ class ActionMailer::ARSendmail
                 [email.id, e.message, e.class, e.backtrace.join("\n\t")]
           email.destroy
           session.reset
-        rescue Net::SMTPServerBusy => e
-          log "server too busy, stopping delivery cycle"
-          return
-        rescue Net::SMTPUnknownError, Net::SMTPSyntaxError, TimeoutError, Timeout::Error => e
+        rescue Net::SMTPServerBusy, Net::SMTPUnknownError, Net::SMTPSyntaxError, TimeoutError, Timeout::Error => e
           email.last_send_attempt = Time.now.to_i
           email.save rescue nil
           log "error sending email %d: %p(%s):\n\t%s" %
                 [email.id, e.message, e.class, e.backtrace.join("\n\t")]
-          session.reset
+          if e.is_a? Net::SMTPServerBusy
+            log "server too busy, stopping delivery cycle"
+            return
+          else
+            session.reset
+          end
         end
       end
     end
